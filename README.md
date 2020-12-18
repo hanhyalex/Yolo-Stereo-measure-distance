@@ -1,99 +1,88 @@
-# keras-yolo3
-
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
-
-## Introduction
-
-A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
+使用介绍：
 
 
----
 
-## Quick Start
+本软件是为了完成我的毕业设计所制作，之所以放到这里是为了推进一下自己的进度，以及做一下使用方法说明，如果有人想拿去发论文也可以，毕竟开源就是为了分享知识，共同进步。
 
-1. Download YOLOv3 weights from [YOLO website](http://pjreddie.com/darknet/yolo/).
-2. Convert the Darknet YOLO model to a Keras model.
-3. Run YOLO detection.
 
-```
-wget https://pjreddie.com/media/files/yolov3.weights
-python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
-python yolo_video.py [OPTIONS...] --image, for image detection mode, OR
-python yolo_video.py [video_path] [output_path (optional)]
-```
+本文首先介绍软件作用，然后介绍使用方法
 
-For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
 
-### Usage
-Use --help to see usage of yolo_video.py:
-```
-usage: yolo_video.py [-h] [--model MODEL] [--anchors ANCHORS]
-                     [--classes CLASSES] [--gpu_num GPU_NUM] [--image]
-                     [--input] [--output]
+**软件作用：**
 
-positional arguments:
-  --input        Video input path
-  --output       Video output path
 
-optional arguments:
-  -h, --help         show this help message and exit
-  --model MODEL      path to model weight file, default model_data/yolo.h5
-  --anchors ANCHORS  path to anchor definitions, default
-                     model_data/yolo_anchors.txt
-  --classes CLASSES  path to class definitions, default
-                     model_data/coco_classes.txt
-  --gpu_num GPU_NUM  Number of GPU to use, default 1
-  --image            Image detection mode, will ignore all positional arguments
-```
----
+目前的版本可以做到对玉米苗的识别与距离测量，当然如果你做一点很微小的改动，就可以实现对任意物体的识别与距离测量，在机器视觉领域可以说是应用性极强，可以完成多种题目的论文。
 
-4. MultiGPU usage: use `--gpu_num N` to use N GPUs. It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
+第一部分：物体识别部分
 
-## Training
 
-1. Generate your own annotation file and class names file.  
-    One row for one image;  
-    Row format: `image_file_path box1 box2 ... boxN`;  
-    Box format: `x_min,y_min,x_max,y_max,class_id` (no space).  
-    For VOC dataset, try `python voc_annotation.py`  
-    Here is an example:
-    ```
-    path/to/img1.jpg 50,100,150,200,0 30,50,200,120,3
-    path/to/img2.jpg 120,300,250,600,2
-    ...
-    ```
+此部分根据基于tensorflow1.x实现的yolo完成（[https://github.com/qqwweee/keras-yolo3.git](https://github.com/qqwweee/keras-yolo3.git)），如果想识别某几种特定的物体就需要自行对yolo进行训练，生成对应的.weight文件，放置在指定目录下即可完成，对后续的测距环节没有影响
 
-2. Make sure you have run `python convert.py -w yolov3.cfg yolov3.weights model_data/yolo_weights.h5`  
-    The file model_data/yolo_weights.h5 is used to load pretrained weights.
 
-3. Modify train.py and start training.  
-    `python train.py`  
-    Use your trained weights or checkpoint weights with command line option `--model model_file` when using yolo_video.py
-    Remember to modify class path or anchor path, with `--classes class_file` and `--anchors anchor_file`.
 
-If you want to use original pretrained weights for YOLOv3:  
-    1. `wget https://pjreddie.com/media/files/darknet53.conv.74`  
-    2. rename it as darknet53.weights  
-    3. `python convert.py -w darknet53.cfg darknet53.weights model_data/darknet53_weights.h5`  
-    4. use model_data/darknet53_weights.h5 in train.py
+第二部分：测距部分
 
----
 
-## Some issues to know
+此部分使用opencv自带的SGBM程序完成，在对双目相机标定后可以实现极为精确的距离输出
 
-1. The test environment is
-    - Python 3.5.2
-    - Keras 2.1.5
-    - tensorflow 1.6.0
 
-2. Default anchors are used. If you use your own anchors, probably some changes are needed.
 
-3. The inference result is not totally the same as Darknet but the difference is small.
+第三部分：GUI设计
 
-4. The speed is slower than Darknet. Replacing PIL with opencv may help a little.
+由于前文程序全部使用python完成，所以为了方便，此部分也使用python的pyqt包进行窗口设计，主题代码是从CSDN文章中找的，然后对其中的按钮进行了重写，使得可以完成特定的任务
 
-5. Always load pretrained weights and freeze layers in the first stage of training. Or try Darknet training. It's OK if there is a mismatch warning.
+**使用方法**
 
-6. The training strategy is for reference only. Adjust it according to your dataset and your goal. And add further strategy if needed.
 
-7. For speeding up the training process with frozen layers train_bottleneck.py can be used. It will compute the bottleneck features of the frozen model first and then only trains the last layers. This makes training on CPU possible in a reasonable time. See [this](https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html) for more information on bottleneck features.
+进入gui，点击选择图片，弹出文件选择器，选择双目相机拍摄的左图，完成后会再次弹出文件选择器，再次选择右图即可完成图片选择。在gui的图形框中会出现最终的图片
+
+
+
+**代码结构介绍**
+
+
+1.yolo结构
+
+权重文件存储地址：keras-yolo3-master\model_data
+
+训练方法详见
+[https://github.com/qqwweee/keras-yolo3.git](https://github.com/qqwweee/keras-yolo3.git)
+
+训练后把对应的classes文件以及.weight文件和.cfh文件复制过来，YOLO部分就自定义完成了
+
+
+2.SGBM结构
+
+SGBM定义在my_yolo.py中的yolo_my_img函数中，如果要自己定义模型的话需要修改**标定数据**，**SGBM参数**，以及一些被我垃圾代码写死的绝对路径，使得你的测距部分更为精确
+
+
+3.测距后处理
+
+其实这个部分是最为困难和可以改进的，每一种物体都有自己的结构，比如汽车与你的距离，你可能会测到车玻璃，车胎，车门，到底哪个是与你车的距离呢，你可能说肯定是车离你最近的点啊，但是你的yolo算法会把包括车的所有部分都算进去，那么怎么才能把最近的点找出来呢。这只是一种情况，比如在我的项目中，要测玉米根茎与我的距离，那么玉米叶和玉米根茎肯定距离不一样啊，你怎么精确定位到玉米根茎呢，为了解决这个问题暂时选用了权衡只计，就是画出直方图，然后对直方图进行操作，找到折中的距离暂时糊弄过去，但这不是最优之策，同样的，这里也是创新点出现的地方，想出你的目标到底应该怎么测。
+
+
+4.重新画框
+
+可能对很多论文来说最后一步才是最重要的，因为你论文中的图片就要用到这个部分进行图片的输出，那么图片一定要精确地显示距离（即使算法不准，你也可以自己修改）
+
+5.测试代码
+
+在主目录下的test_yolo.py是测试代码的位置，这里可以将my_yolo中的代码复制过来，然后直接写在主函数内部，这样就可以在spyder的控制台中看到你的变量和图形输出，对后续调试，改进起到加速的作用
+
+
+
+**下一步的工作**
+
+1.视频输入实时显示 //正在加紧制作
+
+
+2.解决距离如何测算的更加精准 //与导师交流中
+
+
+3.代码格式规范化 //如果真的有人用的话才会进行修改。。。
+
+
+
+
+
+
