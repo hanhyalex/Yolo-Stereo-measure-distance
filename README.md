@@ -18,18 +18,25 @@
 
 此部分根据基于tensorflow1.x实现的yolo完成（[https://github.com/qqwweee/keras-yolo3.git](https://github.com/qqwweee/keras-yolo3.git)），如果想识别某几种特定的物体就需要自行对yolo进行训练，生成对应的.weight文件，放置在指定目录下即可完成，对后续的测距环节没有影响
 
-
+![](https://raw.githubusercontent.com/hanhyalex/pics/main/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201219163747.png)
 
 第二部分：测距部分
 
 
 此部分使用opencv自带的SGBM程序完成，在对双目相机标定后可以实现极为精确的距离输出
 
-
+![](https://raw.githubusercontent.com/hanhyalex/pics/main/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201219163840.png)
 
 第三部分：GUI设计
 
 由于前文程序全部使用python完成，所以为了方便，此部分也使用python的pyqt包进行窗口设计，主题代码是从CSDN文章中找的，然后对其中的按钮进行了重写，使得可以完成特定的任务
+
+
+
+![](https://raw.githubusercontent.com/hanhyalex/pics/main/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201219164447.png)
+
+
+![](https://raw.githubusercontent.com/hanhyalex/pics/main/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201219164422.png)
 
 **使用方法**
 
